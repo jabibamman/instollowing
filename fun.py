@@ -1,5 +1,6 @@
 import json
 import os
+import webbrowser
 
 outDir = 'out'
 directory = outDir + '/whoIsNotFollowingBack.txt'
@@ -39,9 +40,35 @@ def createOutFile():
     return
 
 
-def whoIsNotFollowingBack(list1, list2):
+def createHTMLFile():
+    file_html = open(f"{outDir}/whoIsNotFollowingBack.html", "w")
+    file_html.write('''<html>
+    <head>
+    <title>Instollowing</title>
+    </head> 
+    <body>
+    <h1>That's who is not following you back</h1>     
+    <ul>
+    ''')
+    with open(directory, 'r') as f:
+        for line in f:
+            url = line.split(' ')[1].replace('(', '').replace(')', '')
+            line = '<a href="' + url + '">' + line.split(' ')[0] + '</a>'
+
+            file_html.write('<li>' + line + '</li>')
+    file_html.write('''</ul>
+    </body>
+    </html>''')
+    file_html.close()
+    url = 'file://' + os.path.realpath(file_html.name)
+    webbrowser.open(url, new=2) # open in new tab
+
+
+def whoIsNotFollowingBack(following, followers):
     createOutFile()
     for user in following:
         if user not in followers:
             with open(directory, 'a') as f:
                 f.write(user + '\n')
+
+    createHTMLFile()
