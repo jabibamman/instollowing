@@ -41,7 +41,7 @@ def createOutFile():
 
 def whoIsNotFollowingBack(list1, list2):
     createOutFile()
-    for user in list1:
-        if user not in list2:
+    for user in following:
+        if user not in followers:
             with open(directory, 'a') as f:
                 f.write(user + '\n')
