@@ -1,9 +1,12 @@
 import json
 import os
 import webbrowser
+import instaloader as IL
+from instaloader import instaloader
 
 outDir = 'out'
 directory = outDir + '/whoIsNotFollowingBack.txt'
+instagramLink = 'https://www.instagram.com/'
 
 
 def parseJson(file):
@@ -16,7 +19,6 @@ def parseJson(file):
             for j in i['string_list_data']:
                 item = j['value'] + ' (' + j['href'] + ')'
                 items.append(item)
-
     return sortList(items)
 
 
@@ -61,7 +63,38 @@ def createHTMLFile():
     </html>''')
     file_html.close()
     url = 'file://' + os.path.realpath(file_html.name)
-    webbrowser.open(url, new=2) # open in new tab
+    webbrowser.open(url, new=2)  # open in new tab
+
+
+def loginInstagram():
+    with open('credentials.json') as f:
+        credentials = json.load(f)
+
+    username = credentials['username']
+    password = credentials['password']
+    il = IL.Instaloader()
+    il.login(username, password)
+
+    return il
+
+
+def getFollowersAndFollowing(usernameToCheck):
+    il = loginInstagram()
+    profile = instaloader.Profile.from_username(il.context, usernameToCheck)
+
+    followers_list, following_list = list(profile.get_followers()), list(profile.get_followees())
+    followers, following = [], []
+
+    for follower in followers_list:
+        followers.append(follower.username + ' (' + instagramLink + follower.username + ')')
+
+    for followee in following_list:
+        following.append(followee.username + ' (' + instagramLink + followee.username + ')')
+
+    followers = sorted(followers)
+    following = sorted(following)
+
+    return following, followers
 
 
 def whoIsNotFollowingBack(following, followers):
