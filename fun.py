@@ -1,11 +1,7 @@
 import json
 import os
 import webbrowser
-import configparser
-from os.path import join, dirname
-
 import instaloader as IL
-from dotenv import load_dotenv
 from instaloader import instaloader
 
 outDir = 'out'
@@ -71,13 +67,11 @@ def createHTMLFile():
 
 
 def loginInstagram():
-    dotenv_path = join(dirname(__file__), '.env')
+    with open('credentials.json') as f:
+        credentials = json.load(f)
 
-    load_dotenv(dotenv_path)
-
-    username = os.environ.get("INSTAGRAM_USERNAME")
-    password = os.environ.get("INSTAGRAM_PASSWORD")
-
+    username = credentials['username']
+    password = credentials['password']
     il = IL.Instaloader()
     il.login(username, password)
 
