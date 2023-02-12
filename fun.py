@@ -71,22 +71,21 @@ def createHTMLFile():
 
 
 def loginInstagram():
-    il = True
-
-    return il
-
-
-def getFollowersAndFollowing(usernameToCheck):
     dotenv_path = join(dirname(__file__), '.env')
 
     load_dotenv(dotenv_path)
 
     username = os.environ.get("INSTAGRAM_USERNAME")
     password = os.environ.get("INSTAGRAM_PASSWORD")
-    print("username: " + username + " password: " + password)
+
     il = IL.Instaloader()
     il.login(username, password)
 
+    return il
+
+
+def getFollowersAndFollowing(usernameToCheck):
+    il = loginInstagram()
     profile = instaloader.Profile.from_username(il.context, usernameToCheck)
 
     followers_list, following_list = list(profile.get_followers()), list(profile.get_followees())
