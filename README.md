@@ -12,14 +12,16 @@ Instollowing is a simple script to get the list of people who are following and 
 At this point, you can either use the script with your own credentials or use json files containing your data provided by Instagram.
 4.  a) Drag _`following.txt`_ and _`followers.txt`_ into the project folder (to get these files, go to your Instagram profile and click on the
 `Settings` button. Then click on `Security and Login` and then click on `Download Data`.)
-
     b) Or, you can use your own instagram credentials by creating a file named _`credentials.json`_ and add your username and password in the following format:
-    ```json
-    {
-         "username": "your_username",
-         "password": "your_password"
-    }
-    ```
+    
+```json  
+{
+     "username": "your_username",
+     "password": "your_password"
+}
+```
+    
+   
 5. Run the script using `python instollowing.py`
 6. Wait for the script to finish running
 7. Check the output file
