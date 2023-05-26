@@ -2,7 +2,7 @@ import json
 import os
 import webbrowser
 import instaloader as IL
-from instaloader import instaloader
+from instaloader import instaloader, TwoFactorAuthRequiredException
 
 outDir = 'out'
 directory = outDir + '/whoIsNotFollowingBack.txt'
@@ -73,7 +73,11 @@ def loginInstagram():
     username = credentials['username']
     password = credentials['password']
     il = IL.Instaloader()
-    il.login(username, password)
+    try:
+        il.login(username, password)
+    except TwoFactorAuthRequiredException:
+        two_factor_code = input("Enter 2FA Code: ")
+        il.two_factor_login(two_factor_code)
 
     return il
 
