@@ -63,7 +63,7 @@ def createHTMLFile():
     </html>''')
     file_html.close()
     url = 'file://' + os.path.realpath(file_html.name)
-    webbrowser.open(url, new=2)  # open in new tab
+    webbrowser.open(url, new=2)
 
 
 def loginInstagram():
@@ -74,10 +74,13 @@ def loginInstagram():
     password = credentials['password']
     il = IL.Instaloader()
     try:
+        il.load_session_from_file(username)
+    except FileNotFoundError:
         il.login(username, password)
-    except TwoFactorAuthRequiredException:
+        il.context.save_session_to_file()
+    except instaloader.TwoFactorAuthRequiredException:
         two_factor_code = input("Enter 2FA Code: ")
-        il.two_factor_login(two_factor_code)
+        il.context.two_factor_login(two_factor_code)
 
     return il
 
