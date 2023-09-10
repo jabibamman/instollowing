@@ -2,7 +2,7 @@ import json
 import os
 import webbrowser
 import instaloader as IL
-from instaloader import instaloader, TwoFactorAuthRequiredException
+from instaloader import instaloader
 
 outDir = 'out'
 directory = outDir + '/whoIsNotFollowingBack.txt'
