@@ -1,3 +1,4 @@
+import csv
 import json
 import os
 import webbrowser
@@ -5,25 +6,30 @@ import instaloader as IL
 from instaloader import instaloader
 
 outDir = 'out'
-directory = outDir + '/whoIsNotFollowingBack.txt'
+directory = outDir + '/whoIsNotFollowingBack.csv'
 instagramLink = 'https://www.instagram.com/'
+imgUrl = "logo.jpg"
 
 
 def parseJson(file):
-    items = []
+    items = list()
     with open(file) as f:
         data = json.load(f)
-        typeRelationShips = 'relationships_following' if 'relationships_following' in data else 'relationships_followers'
+        typeRelationShips = 'relationships_following' if 'relationships_following' in data else 'relationships_follower'
 
         for i in data[typeRelationShips]:
             for j in i['string_list_data']:
-                item = j['value'] + ' (' + j['href'] + ')'
+                item = {
+                    'username': j['value'],
+                    'url': j['href'],
+                    'imgUrl': imgUrl
+                }
                 items.append(item)
     return sortList(items)
 
 
-def sortList(list):
-    return sorted(list)
+def sortList(items):
+    return sorted(items, key=lambda x: x['username'])
 
 
 def createOutFolder():
@@ -52,40 +58,49 @@ def createHTMLFile():
     <h1>That's who is not following you back</h1>     
     <ul>
     ''')
-    with open(directory, 'r') as f:
-        for line in f:
-            url = line.split(' ')[1].replace('(', '').replace(')', '')
-            line = '<a href="' + url + '">' + line.split(' ')[0] + '</a>'
+    with open(directory, 'r') as csvfile:
+        reader = csv.reader(csvfile, delimiter=';')
+        for row in reader:
+            if row[0] == 'username': continue
+
+            line = ('<img src="' + row[2] + '" width="50" height="50">') + (
+                    '<a href="' + row[1] + '">' + row[0] + '</a>') if row[2] != 'none' else (
+                    '<a href="' + row[1] + '">' + row[0] + '</a>')
 
             file_html.write('<li>' + line + '</li>')
-    file_html.write('''</ul>
-    </body>
-    </html>''')
+            file_html.write('\n     ')
+    file_html.write('''
+    </ul>
+  </body>
+</html>
+''')
     file_html.close()
     url = 'file://' + os.path.realpath(file_html.name)
     webbrowser.open(url, new=2)
 
 
+# Actually this function is not fully working because of the 2FA
 def loginInstagram():
     with open('credentials.json') as f:
         credentials = json.load(f)
 
     username = credentials['username']
     password = credentials['password']
+
     il = IL.Instaloader()
+
     try:
-        il.load_session_from_file(username)
-    except FileNotFoundError:
         il.login(username, password)
-        il.context.save_session_to_file()
+        print("Successfully logged in.")
     except instaloader.TwoFactorAuthRequiredException:
-        two_factor_code = input("Enter 2FA Code: ")
-        il.context.two_factor_login(two_factor_code)
+        code_2fa = input("2FA Code : ")
+        il.two_factor_login(code_2fa)
 
     return il
 
 
-def getFollowersAndFollowing(usernameToCheck):
+def getFollowersAndFollowing():
+    usernameToCheck = "abib_james"
     il = loginInstagram()
     profile = instaloader.Profile.from_username(il.context, usernameToCheck)
 
@@ -93,10 +108,10 @@ def getFollowersAndFollowing(usernameToCheck):
     followers, following = [], []
 
     for follower in followers_list:
-        followers.append(follower.username + ' (' + instagramLink + follower.username + ')')
+        followers.append(follower.username + ";" + instagramLink + follower.username + ";none")
 
     for followee in following_list:
-        following.append(followee.username + ' (' + instagramLink + followee.username + ')')
+        following.append(followee.username + ';' + instagramLink + followee.username)
 
     followers = sorted(followers)
     following = sorted(following)
@@ -106,9 +121,16 @@ def getFollowersAndFollowing(usernameToCheck):
 
 def whoIsNotFollowingBack(following, followers):
     createOutFile()
+    usernames_followers = {f['username'] for f in followers}
+
     for user in following:
-        if user not in followers:
+        print(user)
+        if user['username'] not in usernames_followers:
             with open(directory, 'a') as f:
-                f.write(user + '\n')
+                if os.stat(directory).st_size == 0:
+                    f.write('username;url;imgUrl\n')
+
+                user_info = f"{user['username']};{user['url']};{user['imgUrl']}"
+                f.write(user_info + '\n')
 
     createHTMLFile()
