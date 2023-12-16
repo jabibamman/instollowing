@@ -30,5 +30,5 @@ jobs:
         black .
         git config --global user.name 'github-actions'
         git config --global user.email 'github-actions@github.com'
-        git commit -am "Apply Black Formatting" -a || true
+        git commit -am "restyle: format code with black" -a || true
         git push origin HEAD:${{ github.head_ref }}
