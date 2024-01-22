@@ -1,5 +1,9 @@
 # Instollowing
 
+![GitHub Release](https://img.shields.io/github/v/release/jabibamman/instollowing)
+[![codecov](https://codecov.io/gh/jabibamman/instollowing/graph/badge.svg?token=H6H59NPSDB)](https://codecov.io/gh/jabibamman/instollowing)
+[![Maintainability Rating](https://sonarcloud.io/api/project_badges/measure?project=jabibamman_instollowing&metric=sqale_rating)](https://sonarcloud.io/summary/new_code?id=jabibamman_instollowing)
+
 Instollowing is a simple script to get the list of people who are following and not following you back on Instagram.
 
 ## Usage
