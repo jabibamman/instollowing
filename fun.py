@@ -22,23 +22,26 @@ class Instollowing:
         items = list()
         with open(file) as f:
             data = json.load(f)
-            typeRelationShips = (
-                "relationships_following"
-                if "relationships_following" in data
-                else "relationships_follower"
-            )
+            if "relationships_following" in data:
+                data_to_iterate = data["relationships_following"]
+            elif "relationships_follower" in data:
+                data_to_iterate = data["relationships_follower"]
+            else:
+                data_to_iterate = data
 
-            for i in data[typeRelationShips]:
-                for j in i["string_list_data"]:
+            for relationship_data in data_to_iterate:
+                for j in relationship_data.get("string_list_data", []):
                     item = {
                         "username": j["value"],
                         "url": j["href"],
                         "imgUrl": self.imgUrl,
                     }
                     items.append(item)
+
         return self.sortList(items)
 
-    def sortList(self, items):
+    @staticmethod
+    def sortList(items):
         return sorted(items, key=lambda x: x["username"])
 
     def createOutFolder(self):
